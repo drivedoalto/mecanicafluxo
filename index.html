@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mecânica Fluxo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        .header {
+            width: 100%;
+            background-color: #000; /* Fundo preto */
+            color: #8a2be2; /* Texto roxo */
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Centraliza o conteúdo horizontalmente */
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .header img {
+            height: 40px;
+            margin-right: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 36px; /* Aumenta o tamanho da fonte */
+            font-style: italic; /* Define o texto como itálico */
+            text-align: center; /* Centraliza o texto */
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 300px; /* Define três colunas: duas flexíveis e uma fixa para o resultado */
+            gap: 20px; /* Espaçamento entre colunas */
+            padding: 20px;
+            max-width: 1200px; /* Largura máxima da página */
+            width: 100%; /* Ajusta a largura da página */
+            margin-top: 20px; /* Espaçamento abaixo do cabeçalho */
+        }
+        .column {
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        .column h2 {
+            margin-top: 0;
+        }
+        .item-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .item-list li {
+            margin-bottom: 10px;
+        }
+        .item-list button {
+            padding: 10px;
+            background-color: #8a2be2; /* Cor roxa */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            box-sizing: border-box;
+        }
+        .item-list button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #cart {
+            list-style-type: none;
+            padding: 0;
+        }
+        #cart li {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #cart button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #cart button:hover {
+            background-color: #c82333;
+        }
+        #total {
+            font-weight: bold;
+        }
+        #clear-cart {
+            margin-top: 20px;
+            background-color: #dc3545;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        #clear-cart:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <div class="header">
+        <img src="logo.jpg" alt="Logo">
+        <h1>Mecânica Fluxo</h1>
+    </div>
+
+    <div class="container">
+        <!-- Coluna Esquerda -->
+        <div class="column">
+            <h2>TABELA DE VALORES</h2>
+            <ul class="item-list" id="values-list">
+                <li><button data-name="BLINDAGEM VEICULO" data-value="1800" class="add-to-cart">BLINDAGEM VEICULO 1800 K</button></li>
+                <li><button data-name="BLINDAGEM PNEU" data-value="25" class="add-to-cart">BLINDAGEM PNEU 25 K</button></li>
+                <li><button data-name="FULL TUNING" data-value="600" class="add-to-cart">FULL TUNING 600 K</button></li>
+                <li><button data-name="NEON FAROL" data-value="50" class="add-to-cart">NEON FAROL 50 K</button></li>
+                <li><button data-name="XENON EMBAIXO" data-value="50" class="add-to-cart">XENON EMBAIXO 50 K</button></li>
+                <li><button data-name="SUSPENSÃO" data-value="50" class="add-to-cart">SUSPENSÃO 50 K</button></li>
+            </ul>
+
+            <h2>CORES</h2>
+            <ul class="item-list" id="colors-list">
+                <li><button data-name="COR METÁLICA" data-value="50" class="add-to-cart">COR METÁLICA 50 K</button></li>
+                <li><button data-name="COR METAL X" data-value="90" class="add-to-cart">COR METAL X 90 K</button></li>
+                <li><button data-name="COR FOSCO X" data-value="65" class="add-to-cart">COR FOSCO X 65 K</button></li>
+                <li><button data-name="COR CROMADO X" data-value="90" class="add-to-cart">COR CROMADO X 90 K</button></li>
+                <li><button data-name="COR PEROLADO" data-value="65" class="add-to-cart">COR PEROLADO 65 K</button></li>
+            </ul>
+
+            <h2>TUNING SEPARADO</h2>
+            <ul class="item-list" id="tuning-list">
+                <li><button data-name="MOTOR (Separado)" data-value="200" class="add-to-cart">MOTOR (Separado) 200 K</button></li>
+                <li><button data-name="TRANSMISSÃO (Separado)" data-value="200" class="add-to-cart">TRANSMISSÃO (Separado) 200 K</button></li>
+                <li><button data-name="FREIO (Separado)" data-value="200" class="add-to-cart">FREIO (Separado) 200 K</button></li>
+                <li><button data-name="TURBO (Separado)" data-value="250" class="add-to-cart">TURBO (Separado) 250 K</button></li>
+            </ul>
+        </div>
+
+        <!-- Coluna Central -->
+        <div class="column">
+            <h2>ESTÉTICA</h2>
+            <ul class="item-list" id="aesthetic-list">
+                <li><button data-name="VIDRO FUMÊ" data-value="40" class="add-to-cart">VIDRO FUMÊ 40 K</button></li>
+                <li><button data-name="FUMAÇA DO PNEU" data-value="50" class="add-to-cart">FUMAÇA DO PNEU 50 K</button></li>
+                <li><button data-name="COR DA RODA" data-value="50" class="add-to-cart">COR DA RODA 50 K</button></li>
+                <li><button data-name="TROCA DA RODA" data-value="100" class="add-to-cart">TROCA DA RODA 100 K</button></li>
+                <li><button data-name="AEROFÓLIO" data-value="100" class="add-to-cart">AEROFÓLIO 100 K</button></li>
+                <li><button data-name="PARA-CHOQUE DIANTEIRO" data-value="40" class="add-to-cart">PARA-CHOQUE DIANTEIRO 40 K</button></li>
+                <li><button data-name="PARA-CHOQUE TRASEIRO" data-value="45" class="add-to-cart">PARA-CHOQUE TRASEIRO 45 K</button></li>
+                <li><button data-name="SAIAS LATERAIS" data-value="40" class="add-to-cart">SAIAS LATERAIS 40 K</button></li>
+                <li><button data-name="ESCAPAMENTO" data-value="45" class="add-to-cart">ESCAPAMENTO 45 K</button></li>
+                <li><button data-name="GAIOLA" data-value="40" class="add-to-cart">GAIOLA 40 K</button></li>
+                <li><button data-name="GRELHA" data-value="40" class="add-to-cart">GRELHA 40 K</button></li>
+                <li><button data-name="CAPO" data-value="40" class="add-to-cart">CAPO 40 K</button></li>
+                <li><button data-name="PARALAMAS" data-value="40" class="add-to-cart">PARALAMAS 40 K</button></li>
+                <li><button data-name="TETO" data-value="40" class="add-to-cart">TETO 40 K</button></li>
+                <li><button data-name="BUZINA" data-value="10" class="add-to-cart">BUZINA 10 K</button></li>
+                <li><button data-name="ADESIVOS/DECAL" data-value="80" class="add-to-cart">ADESIVOS/DECAL 80 K</button></li>
+                <li><button data-name="PNEU CUSTOM" data-value="25" class="add-to-cart">PNEU CUSTOM 25 K</button></li>
+                <li><button data-name="PLACA" data-value="10" class="add-to-cart">PLACA 10 K</button></li>
+                <li><button data-name="EXTRA" data-value="70" class="add-to-cart">EXTRA 70 K</button></li>
+            </ul>
+        </div>
+
+        <!-- Coluna Direita -->
+        <div class="column">
+            <h2>RESULTADO (CARRINHO)</h2>
+            <ul id="cart"></ul>
+            <div id="total">R$0k</div>
+            <button id="clear-cart">Limpar Carrinho</button>
+        </div>
+    </div>
+
+    <script>
+        const updateTotal = (amount) => {
+            currentTotal += amount;
+            document.getElementById('total').textContent = `R$${currentTotal}k`;
+        };
+
+        let currentTotal = 0;
+
+        // Adiciona a funcionalidade de adicionar ao carrinho
+        document.querySelectorAll('.item-list button').forEach(button => {
+            button.addEventListener('click', () => {
+                const name = button.getAttribute('data-name');
+                const value = parseInt(button.getAttribute('data-value'), 10);
+
+                const cartItem = document.createElement('li');
+                cartItem.innerHTML = `${name} <span>R$${value}k</span><button class="remove-item">Remover</button>`;
+
+                document.getElementById('cart').appendChild(cartItem);
+                updateTotal(value);
+                button.disabled = true; // Desativa o botão após adicionar ao carrinho
+
+                // Adiciona funcionalidade de remover item do carrinho
+                cartItem.querySelector('.remove-item').addEventListener('click', () => {
+                    updateTotal(-value);
+                    button.disabled = false; // Reativa o botão correspondente
+                    cartItem.remove(); // Remove o item do carrinho
+                });
+            });
+        });
+
+        // Limpa o carrinho e reativa todos os botões
+        document.getElementById('clear-cart').addEventListener('click', () => {
+            // Limpa o carrinho
+            document.getElementById('cart').innerHTML = '';
+            document.getElementById('total').textContent = 'R$0k';
+            currentTotal = 0; // Reseta o total
+
+            // Reativa todos os botões
+            document.querySelectorAll('.item-list button').forEach(button => {
+                button.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
