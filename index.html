@@ -17,14 +17,17 @@
         }
         .header {
             width: 100%;
-            background-color: #000; /* Fundo preto */
+            background-color: #0F0F0F; /* Fundo preto */
             color: #8a2be2; /* Texto roxo */
             display: flex;
             align-items: center;
             justify-content: center; /* Centraliza o conteúdo horizontalmente */
             padding: 10px 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000; /* Garante que o cabeçalho fique acima de outros elementos */
         }
         .header img {
             height: 40px;
@@ -43,7 +46,7 @@
             padding: 20px;
             max-width: 1200px; /* Largura máxima da página */
             width: 100%; /* Ajusta a largura da página */
-            margin-top: 20px; /* Espaçamento abaixo do cabeçalho */
+            margin-top: 80px; /* Espaçamento abaixo do cabeçalho */
         }
         .column {
             background-color: #fff;
@@ -126,6 +129,18 @@
     <div class="container">
         <!-- Coluna Esquerda -->
         <div class="column">
+            <h2>TABELA PARCERIA</h2>
+            <ul class="item-list">
+                <li><button data-name="BLINDAGEM VEICULO" data-value="1700" class="add-to-cart">BLINDAGEM VEICULO 1700 K</button></li>
+                <li><button data-name="BLINDAGEM PNEU" data-value="15" class="add-to-cart">BLINDAGEM PNEU 15 K</button></li>
+                <li><button data-name="BLINDAGEM PNEU FAC" data-value="20" class="add-to-cart">BLINDAGEM PNEU FAC 20 K</button></li>
+                <li><button data-name="FULL TUNING" data-value="550" class="add-to-cart">FULL TUNING 550 K</button></li>
+                <li><button data-name="SUSPENSÃO" data-value="40" class="add-to-cart">SUSPENSÃO 40 K</button></li>
+                <li><button data-name="FUMAÇA DO PNEU" data-value="40" class="add-to-cart">FUMAÇA DO PNEU 40 K</button></li>
+                <li><button data-name="COR DA RODA" data-value="40" class="add-to-cart">COR DA RODA 40 K</button></li>
+                <li><button data-name="TROCA DA RODA FAC" data-value="90" class="add-to-cart">TROCA DA RODA FAC 90 K</button></li>
+            </ul>
+
             <h2>TABELA DE VALORES</h2>
             <ul class="item-list" id="values-list">
                 <li><button data-name="BLINDAGEM VEICULO" data-value="1800" class="add-to-cart">BLINDAGEM VEICULO 1800 K</button></li>
@@ -157,7 +172,7 @@
         <!-- Coluna Central -->
         <div class="column">
             <h2>ESTÉTICA</h2>
-            <ul class="item-list" id="aesthetic-list">
+            <ul class="item-list">
                 <li><button data-name="VIDRO FUMÊ" data-value="40" class="add-to-cart">VIDRO FUMÊ 40 K</button></li>
                 <li><button data-name="FUMAÇA DO PNEU" data-value="50" class="add-to-cart">FUMAÇA DO PNEU 50 K</button></li>
                 <li><button data-name="COR DA RODA" data-value="50" class="add-to-cart">COR DA RODA 50 K</button></li>
@@ -182,54 +197,78 @@
 
         <!-- Coluna Direita -->
         <div class="column">
-            <h2>RESULTADO (CARRINHO)</h2>
+            <h2>CARRINHO</h2>
             <ul id="cart"></ul>
-            <div id="total">R$0k</div>
+            <div id="total">Total: R$ 0,00</div>
             <button id="clear-cart">Limpar Carrinho</button>
         </div>
     </div>
 
     <script>
-        const updateTotal = (amount) => {
-            currentTotal += amount;
-            document.getElementById('total').textContent = `R$${currentTotal}k`;
-        };
+        // Função para atualizar o total do carrinho
+        function updateCartTotal() {
+            let total = 0;
+            const cartItems = document.querySelectorAll('#cart li');
+            cartItems.forEach(item => {
+                const price = parseFloat(item.getAttribute('data-price'));
+                total += price;
+            });
+            document.getElementById('total').innerText = `Total: R$ ${total.toFixed(2)}`;
+        }
 
-        let currentTotal = 0;
+        // Adiciona item ao carrinho
+        function addToCart(name, value) {
+            const cart = document.getElementById('cart');
+            const existingItem = Array.from(cart.children).find(item => item.getAttribute('data-name') === name);
+            
+            if (existingItem) {
+                const quantity = parseInt(existingItem.getAttribute('data-quantity')) || 1;
+                existingItem.setAttribute('data-quantity', quantity + 1);
+                existingItem.querySelector('span').innerText = `${name} x${quantity + 1} - R$ ${(value * (quantity + 1)).toFixed(2)}`;
+            } else {
+                const li = document.createElement('li');
+                li.setAttribute('data-name', name);
+                li.setAttribute('data-price', value);
+                li.innerHTML = `${name} - R$ ${value.toFixed(2)} <button class="remove-item">Remover</button>`;
+                cart.appendChild(li);
+            }
+            updateCartTotal();
+        }
 
-        // Adiciona a funcionalidade de adicionar ao carrinho
-        document.querySelectorAll('.item-list button').forEach(button => {
+        // Remove item do carrinho
+        function removeFromCart(name) {
+            const cart = document.getElementById('cart');
+            const item = Array.from(cart.children).find(item => item.getAttribute('data-name') === name);
+            if (item) {
+                cart.removeChild(item);
+            }
+            updateCartTotal();
+        }
+
+        // Adiciona evento de clique aos botões
+        document.querySelectorAll('.add-to-cart').forEach(button => {
             button.addEventListener('click', () => {
                 const name = button.getAttribute('data-name');
-                const value = parseInt(button.getAttribute('data-value'), 10);
-
-                const cartItem = document.createElement('li');
-                cartItem.innerHTML = `${name} <span>R$${value}k</span><button class="remove-item">Remover</button>`;
-
-                document.getElementById('cart').appendChild(cartItem);
-                updateTotal(value);
+                const value = parseFloat(button.getAttribute('data-value'));
+                addToCart(name, value);
                 button.disabled = true; // Desativa o botão após adicionar ao carrinho
-
-                // Adiciona funcionalidade de remover item do carrinho
-                cartItem.querySelector('.remove-item').addEventListener('click', () => {
-                    updateTotal(-value);
-                    button.disabled = false; // Reativa o botão correspondente
-                    cartItem.remove(); // Remove o item do carrinho
-                });
             });
         });
 
-        // Limpa o carrinho e reativa todos os botões
-        document.getElementById('clear-cart').addEventListener('click', () => {
-            // Limpa o carrinho
-            document.getElementById('cart').innerHTML = '';
-            document.getElementById('total').textContent = 'R$0k';
-            currentTotal = 0; // Reseta o total
+        // Adiciona evento de clique aos botões de remover
+        document.getElementById('cart').addEventListener('click', (event) => {
+            if (event.target.classList.contains('remove-item')) {
+                const name = event.target.parentElement.getAttribute('data-name');
+                removeFromCart(name);
+                document.querySelector(`.add-to-cart[data-name="${name}"]`).disabled = false; // Reativa o botão correspondente
+            }
+        });
 
-            // Reativa todos os botões
-            document.querySelectorAll('.item-list button').forEach(button => {
-                button.disabled = false;
-            });
+        // Limpa o carrinho
+        document.getElementById('clear-cart').addEventListener('click', () => {
+            document.getElementById('cart').innerHTML = '';
+            updateCartTotal();
+            document.querySelectorAll('.add-to-cart').forEach(button => button.disabled = false); // Reativa todos os botões
         });
     </script>
 </body>
